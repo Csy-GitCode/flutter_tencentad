@@ -19,7 +19,7 @@ import {
   GDTInterstitialAd,
   GDTInteractionListener,
   GDTVideoStateListener,
-  GDTError,
+  GDTError, GDTGlobalSetting,
 } from '@gdt/gdt-union-sdk';
 import FlutterTencentadEventPlugin from './FlutterTencentadEventPlugin';
 import FlutterTencentadViewPlugin from './FlutterTencentadViewPlugin';
@@ -112,9 +112,13 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
   // SDK 初始化
   private register(call: MethodCall, result: MethodResult): void {
     const ohosId: string = call.args.get("ohosId");
+    const personalized: number = call.args.get("personalized");
     const debug: boolean = call.args.get("debug") ?? false;
 
-    console.info(`FlutterTencentadPlugin register appId: ${ohosId}, debug: ${debug}`);
+    console.info(`FlutterTencentadPlugin register appId: ${ohosId}, personalized: ${personalized == 0}, debug: ${debug}`);
+
+    // 是否关闭个性化推荐
+    GDTGlobalSetting.setPersonalizedAdEnabled(personalized == 0);
 
     GDTAdSDK.init(this.uiAbility?.context, {
       appId: ohosId
