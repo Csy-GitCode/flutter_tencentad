@@ -55,7 +55,9 @@ class _SplashPageState extends State<SplashPage> {
             print("开屏广告曝光");
           }, onFail: (code, message) {
             print("开屏广告失败  $code $message");
-            _bidding.biddingResult(FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.TIME_OUT, FlutterTencentAdADNID.othoerADN));
+            final random = Random();
+            int winPrice = random.nextInt(5000) + 1000;
+            _bidding.biddingResult(FlutterTencentBiddingResult().fail(winPrice, FlutterTencentAdBiddingLossReason.TIME_OUT, FlutterTencentAdADNID.othoerADN));
             Navigator.pop(context);
           }, onECPM: (ecpmLevel, ecpm) {
             print("开屏广告竞价  ecpmLevel=$ecpmLevel  ecpm=$ecpm");
@@ -70,10 +72,12 @@ class _SplashPageState extends State<SplashPage> {
               //最大竞败方出价，类型为Integer
               _bidding.biddingResult(FlutterTencentBiddingResult().success(ecpm, highestLossPrice));
             } else {
+              final random = Random();
+              int winPrice = random.nextInt(5000) + 1000;
               //竞胜方出价（单位：分），类型为Integer
               //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
               //竞胜方渠道ID FlutterTencentAdADNID
-              _bidding.biddingResult(FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
+              _bidding.biddingResult(FlutterTencentBiddingResult().fail(winPrice, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
             }
           }),
         ),
