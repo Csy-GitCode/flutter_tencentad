@@ -22,7 +22,7 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  FlutterTencentAdBiddingController _bidding = new FlutterTencentAdBiddingController();
+  final FlutterTencentAdBiddingController _bidding = new FlutterTencentAdBiddingController();
 
   @override
   Widget build(BuildContext context) {
