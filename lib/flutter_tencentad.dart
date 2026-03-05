@@ -16,8 +16,7 @@ part 'flutter_tencentad_callback.dart';
 part 'flutter_tencentad_bidding_controller.dart';
 
 class FlutterTencentad {
-  static const MethodChannel _channel =
-      const MethodChannel('flutter_tencentad');
+  static const MethodChannel _channel = const MethodChannel('flutter_tencentad');
 
   ///
   /// # SDK注册初始化
@@ -31,7 +30,7 @@ class FlutterTencentad {
   /// [channelId] channelId 渠道id [FlutterTencentadChannel]
   ///
   /// [personalized] personalized 是否开启个性化广告 [FlutterTencentadPersonalized]
-  /// 
+  ///
   /// [enableCollectAppInstallStatus] 安卓隐私合规 是否开启收集应用安装状态
   ///
   static Future<bool> register({
@@ -41,8 +40,8 @@ class FlutterTencentad {
     int? personalized,
     bool? debug,
     int? channelId,
-    Map<String,bool>? androidPrivacy,
-    Map<String,bool>? convOptimizelnfo,
+    Map<String, bool>? androidPrivacy,
+    Map<String, bool>? convOptimizelnfo,
     bool? enableCollectAppInstallStatus,
   }) async {
     return await _channel.invokeMethod("register", {
@@ -117,8 +116,7 @@ class FlutterTencentad {
   /// # 显示激励广告
   ///
   /// [result] 竞价成功、失败后调用 [FlutterTencentBiddingResult] ,isBidding = true时必传
-  static Future<bool> showRewardVideoAd(
-      {FlutterTencentBiddingResult? result}) async {
+  static Future<bool> showRewardVideoAd({FlutterTencentBiddingResult? result}) async {
     return await _channel.invokeMethod("showRewardVideoAd", result?.toJson() ?? {});
   }
 
@@ -161,9 +159,17 @@ class FlutterTencentad {
   ///
   /// [result] 竞价成功、失败后调用 [FlutterTencentBiddingResult] ,isBidding = true时必传
   ///
-  static Future<bool> showUnifiedInterstitialAD(
-      {FlutterTencentBiddingResult? result}) async {
+  static Future<bool> showUnifiedInterstitialAD({FlutterTencentBiddingResult? result}) async {
     return await _channel.invokeMethod("showInterstitialAD", result?.toJson() ?? {});
+  }
+
+  /// 实时竞价，鸿蒙平台
+  ///
+  /// 广告请求失败时上报
+  ///
+  /// [result] 竞价失败后调用 [FlutterTencentBiddingResult] ,isBidding = true时必传
+  static Future<bool> biddingAdLoadError({FlutterTencentBiddingResult? result}) async {
+    return await _channel.invokeMethod("biddingAdLoadError", result?.toJson() ?? {});
   }
 
   ///

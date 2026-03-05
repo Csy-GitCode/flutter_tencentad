@@ -1,12 +1,5 @@
 import {
-  AbilityAware,
-  AbilityPluginBinding,
-  FlutterPlugin,
-  FlutterPluginBinding,
-  MethodCall,
-  MethodCallHandler,
-  MethodChannel,
-  MethodResult,
+  AbilityAware, AbilityPluginBinding, FlutterPlugin, FlutterPluginBinding, MethodCall, MethodCallHandler, MethodChannel, MethodResult,
 } from '@ohos/flutter_ohos';
 import { UIAbility } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
@@ -19,7 +12,9 @@ import {
   GDTInterstitialAd,
   GDTInteractionListener,
   GDTVideoStateListener,
-  GDTError, GDTGlobalSetting,
+  GDTError,
+  GDTGlobalSetting,
+  GDTBiddingConstants,
 } from '@gdt/gdt-union-sdk';
 import FlutterTencentadEventPlugin from './FlutterTencentadEventPlugin';
 import FlutterTencentadViewPlugin from './FlutterTencentadViewPlugin';
@@ -30,14 +25,11 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
   private applicationContext: Context | null = null;
   private uiAbility: UIAbility | null = null;
   private flutterPluginBinding: FlutterPluginBinding | null = null;
-
   // 静态实例，用于其他组件获取 windowStage
   private static instance: FlutterTencentadPlugin | null = null;
-
   // 激励视频广告
   private rewardAd: GDTRewardAd | null = null;
   private rewardAdConfig: Map<string, string | number | boolean> = new Map();
-
   // 插屏广告
   private interstitialAd: GDTInterstitialAd | null = null;
   private interstitialAdConfig: Map<string, string | number | boolean> = new Map();
@@ -102,6 +94,9 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
         break;
       case "showInterstitialAD":
         this.showInterstitialAd(call, result);
+        break;
+      case "biddingAdLoadError": // 广告请求失败时
+        this.biddingAdLoadError(call, result);
         break;
       default:
         result.notImplemented();
@@ -471,10 +466,14 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
     };
 
     const videoStateListener: GDTVideoStateListener = {
-      onVideoReady: (): void => {},
-      onVideoStart: (): void => {},
-      onVideoPause: (): void => {},
-      onVideoResume: (): void => {},
+      onVideoReady: (): void => {
+      },
+      onVideoStart: (): void => {
+      },
+      onVideoPause: (): void => {
+      },
+      onVideoResume: (): void => {
+      },
       onVideoComplete: (): void => {
         const map: Record<string, string | number> = {
           "adType": "interactAd",
@@ -482,7 +481,8 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
         };
         FlutterTencentadEventPlugin.sendContent(map);
       },
-      onVideoError: (err: GDTError): void => {}
+      onVideoError: (err: GDTError): void => {
+      }
     };
 
     this.interstitialAd.setInteractionListener(interactionListener);
@@ -492,6 +492,32 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
     console.info("FlutterTencentadPlugin 开始展示插屏广告");
     this.interstitialAd.show(currentWindowStage);
     console.info("FlutterTencentadPlugin 插屏广告 show 方法已调用");
+    result.success(true);
+  }
+
+  /**
+   * 实时竞价
+   * 广告请求失败时上报
+   */
+  private biddingAdLoadError(call: MethodCall, result: MethodResult): void {
+    const posId: string = call.args.get("posId");
+    const winPrice: number = call.args.get("winPrice");
+    const lossReason: number = call.args.get("lossReason");
+    const adnId: number = call.args.get("adnId");
+
+    console.info(`posId: ${posId}`);
+    console.info(`winPrice: ${winPrice}`);
+    console.info(`lossReason: ${lossReason}`);
+    console.info(`adnId: ${adnId}`);
+
+    GDTAdSDK.sendLossNotification(new Map([
+      [GDTBiddingConstants.POS_ID, posId],
+      [GDTBiddingConstants.WIN_PRICE, '' + winPrice],
+      [GDTBiddingConstants.LOSS_REASON, '' + lossReason],
+      [GDTBiddingConstants.ADN_ID, '' + adnId],
+      [GDTBiddingConstants.WATERFALL_REQ_ID, '' + new Date().getTime()],
+    ]));
+    console.info("实时竞价 - 广告请求失败时上报");
     result.success(true);
   }
 }

@@ -12,4 +12,6 @@ export default class FlutterTencentadConfig {
     bannerAdView: "com.gstory.flutter_tencentad/BannerAdView",
     nativeExpressAdView: "com.gstory.flutter_tencentad/NativeExpressAdView"
   };
+
+  public static eventId: number = 20260305;
 }

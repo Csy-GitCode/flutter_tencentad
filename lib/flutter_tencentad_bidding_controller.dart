@@ -37,6 +37,7 @@ class FlutterTencentBiddingResult {
   int? winPrice;
   int? lossReason;
   String? adnId;
+  String? posId;
 
   bool isSuccess = true;
 
@@ -61,11 +62,14 @@ class FlutterTencentBiddingResult {
   /// [lossReason] 优量汇广告竞败原因，类型为Integer。必填 [FlutterTencentAdBiddingLossReason]
   ///
   /// [adnId] 本次竞胜方渠道ID，类型为Integer。必填。 [FlutterTencentAdADNID]
-  FlutterTencentBiddingResult fail(int winPrice, int lossReason, String adnId) {
+  ///
+  /// [posId] 广告位ID， 鸿蒙必填。
+  FlutterTencentBiddingResult fail(int winPrice, int lossReason, String adnId, {String? posId}) {
     this.isSuccess = false;
     this.winPrice = winPrice;
     this.lossReason = lossReason;
     this.adnId = adnId;
+    this.posId = posId;
     return this;
   }
 
@@ -75,6 +79,7 @@ class FlutterTencentBiddingResult {
     winPrice = json['winPrice'];
     lossReason = json['lossReason'];
     adnId = json['adnId'];
+    posId = json['posId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -85,6 +90,7 @@ class FlutterTencentBiddingResult {
     data['winPrice'] = this.winPrice;
     data['lossReason'] = this.lossReason;
     data['adnId'] = this.adnId;
+    data['posId'] = this.posId;
     return data;
   }
 }
