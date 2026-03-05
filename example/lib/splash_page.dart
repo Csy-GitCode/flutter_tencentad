@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tencentad/flutter_tencentad.dart';
 
@@ -14,22 +16,20 @@ class SplashPage extends StatefulWidget {
   String iosId;
   String ohosId;
 
-  SplashPage(
-      {Key? key,
-      required this.isBidding,
-      required this.androidId,
-      required this.iosId,
-      required this.ohosId,
-      })
-      : super(key: key);
+  SplashPage({
+    Key? key,
+    required this.isBidding,
+    required this.androidId,
+    required this.iosId,
+    required this.ohosId,
+  }) : super(key: key);
 
   @override
   _SplashPageState createState() => _SplashPageState();
 }
 
 class _SplashPageState extends State<SplashPage> {
-  FlutterTencentAdBiddingController _bidding =
-      new FlutterTencentAdBiddingController();
+  final FlutterTencentAdBiddingController _bidding = new FlutterTencentAdBiddingController();
 
   @override
   Widget build(BuildContext context) {
@@ -64,23 +64,25 @@ class _SplashPageState extends State<SplashPage> {
             print("开屏广告曝光");
           }, onFail: (code, message) {
             print("开屏广告失败  $code $message");
+            _bidding.biddingResult(FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.TIME_OUT, FlutterTencentAdADNID.othoerADN));
             Navigator.pop(context);
           }, onECPM: (ecpmLevel, ecpm) {
             print("开屏广告竞价  ecpmLevel=$ecpmLevel  ecpm=$ecpm");
             //规则 自己根据业务处理
             if (ecpm > 0) {
+              final random = Random();
+              final int max = ecpm > 1000 ? 100 : 10;
+              int number = ecpm - (random.nextInt(max) + 1);
+              int highestLossPrice = number > 1 ? number : 1;
+              print("竞胜出价 $ecpm  最大竞败方出价 $highestLossPrice");
               //竞胜出价，类型为Integer
               //最大竞败方出价，类型为Integer
-              _bidding.biddingResult(
-                  FlutterTencentBiddingResult().success(ecpm, 0));
+              _bidding.biddingResult(FlutterTencentBiddingResult().success(ecpm, highestLossPrice));
             } else {
               //竞胜方出价（单位：分），类型为Integer
               //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
               //竞胜方渠道ID FlutterTencentAdADNID
-              _bidding.biddingResult(FlutterTencentBiddingResult().fail(
-                  1000,
-                  FlutterTencentAdBiddingLossReason.LOW_PRICE,
-                  FlutterTencentAdADNID.othoerADN));
+              _bidding.biddingResult(FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
             }
           }),
         ),
