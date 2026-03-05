@@ -71,17 +71,12 @@ class _HomePageState extends State<HomePage> {
           if (ecpm > 0) {
             //竞胜出价，类型为Integer
             //最大竞败方出价，类型为Integer
-            await FlutterTencentad.showRewardVideoAd(
-                result: FlutterTencentBiddingResult().success(ecpm, 0));
+            await FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().success(ecpm, 0));
           } else {
             //竞胜方出价（单位：分），类型为Integer
             //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
             //竞胜方渠道ID FlutterTencentAdADNID
-            await FlutterTencentad.showRewardVideoAd(
-                result: FlutterTencentBiddingResult().fail(
-                    1000,
-                    FlutterTencentAdBiddingLossReason.LOW_PRICE,
-                    FlutterTencentAdADNID.othoerADN));
+            await FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
           }
         },
       ),
@@ -117,17 +112,12 @@ class _HomePageState extends State<HomePage> {
           if (ecpm > 0) {
             //竞胜出价，类型为Integer
             //最大竞败方出价，类型为Integer
-            await FlutterTencentad.showUnifiedInterstitialAD(
-                result: FlutterTencentBiddingResult().success(ecpm, 0));
+            await FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().success(ecpm, 0));
           } else {
             //竞胜方出价（单位：分），类型为Integer
             //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
             //竞胜方渠道ID FlutterTencentAdADNID
-            await FlutterTencentad.showUnifiedInterstitialAD(
-                result: FlutterTencentBiddingResult().fail(
-                    1000,
-                    FlutterTencentAdBiddingLossReason.LOW_PRICE,
-                    FlutterTencentAdADNID.othoerADN));
+            await FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
           }
         },
       ),
@@ -138,9 +128,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _register() async {
     _isRegister = await FlutterTencentad.register(
         //androidId
-        androidId: "1211169508",
+        androidId: "1106246729",
         //iosId
-        iosId: "1211169509",
+        iosId: "1212651177",
         //是否显示日志log
         debug: true,
         //是否显示个性化推荐广告
@@ -183,43 +173,18 @@ class _HomePageState extends State<HomePage> {
         title: const Text('flutter_tencentad'),
       ),
       body: Center(
-        child: Column(
-          children: [
-            Text('优量汇SDK初始化: $_isRegister\n'),
-            Text('SDK版本: $_sdkVersion\n'),
-            //激励广告
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('激励广告'),
-              onPressed: () async {
-                await FlutterTencentad.loadRewardVideoAd(
-                  //android广告id
-                  androidId: "8260663462736446",
-                  //ios广告id
-                  iosId: "2250968442134762",
-                  //用户id
-                  userID: "123",
-                  //奖励
-                  rewardName: "100金币",
-                  //奖励数
-                  rewardAmount: 100,
-                  //扩展参数 服务器回调使用
-                  customData: "",
-                  //下载二次确认弹窗 默认false
-                  downloadConfirm: true,
-                  //是否静音播放 默认false
-                  videoMuted: true,
-                );
-              },
-            ),
-            //激励广告 竞价
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('激励广告（竞价）'),
-              onPressed: () async {
-                await FlutterTencentad.loadRewardVideoAd(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Text('优量汇SDK初始化: $_isRegister\n'),
+              Text('SDK版本: $_sdkVersion\n'),
+              //激励广告
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('激励广告'),
+                onPressed: () async {
+                  await FlutterTencentad.loadRewardVideoAd(
                     //android广告id
                     androidId: "8260663462736446",
                     //ios广告id
@@ -234,142 +199,166 @@ class _HomePageState extends State<HomePage> {
                     customData: "",
                     //下载二次确认弹窗 默认false
                     downloadConfirm: true,
-                    //开启竞价
-                    isBidding: true);
-              },
-            ),
-            //插屏广告（半屏）
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('插屏广告（半屏）'),
-              onPressed: () async {
-                await FlutterTencentad.loadUnifiedInterstitialAD(
-                  //android广告id
-                  androidId: "6270368452032577",
-                  //ios广告id
-                  iosId: "8200166492635708",
-                  //是否全屏
-                  isFullScreen: false,
-                  //下载二次确认弹窗 默认false
-                  downloadConfirm: true,
-                );
-              },
-            ),
-            //插屏广告（全屏）
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('插屏广告（全屏）'),
-              onPressed: () async {
-                await FlutterTencentad.loadUnifiedInterstitialAD(
-                  //android广告id
-                  androidId: "6270368452032577",
-                  //ios广告id
-                  iosId: "8200166492635708",
-                  isFullScreen: true,
-                  //下载二次确认弹窗 默认false
-                  downloadConfirm: true,
-                );
-              },
-            ),
-            //插屏广告（全屏）激励奖励
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('插屏广告（全屏）激励奖励'),
-              onPressed: () async {
-                await FlutterTencentad.loadUnifiedInterstitialAD(
-                  //android广告id
-                  androidId: "6270368452032577",
-                  //ios广告id
-                  iosId: "8200166492635708",
-                  isFullScreen: true,
-                  //下载二次确认弹窗 默认false
-                  downloadConfirm: true,
-                );
-              },
-            ),
-            //插屏广告（半屏竞价）
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('插屏广告（半屏竞价）'),
-              onPressed: () async {
-                await FlutterTencentad.loadUnifiedInterstitialAD(
-                  //android广告id
-                  androidId: "4082654735526092",
-                  //ios广告id
-                  iosId: "6025576861231867",
-                  isFullScreen: false,
-                  //下载二次确认弹窗 默认false
-                  downloadConfirm: true,
-                  //是否开启竞价
-                  isBidding: true,
-                );
-              },
-            ),
-            //Banner广告（平台模板）
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('Banner广告（平台模板）'),
-              onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return new BannerPage();
-                }));
-              },
-            ),
-            //开屏广告
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('开屏广告'),
-              onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return new SplashPage(
-                      isBidding: false,
-                      androidId: "7240264412639400",
-                      iosId: "4210763402133659");
-                }));
-              },
-            ),
-            //开屏广告
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('开屏广告(竞价)'),
-              onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return new SplashPage(
-                      //是否开启竞价
-                      isBidding: true,
-                      androidId: "7240264412639400",
-                      iosId: "4210763402133659");
-                }));
-              },
-            ),
-            //动态信息流/横幅/视频贴片广告
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('动态信息流/横幅/视频贴片广告'),
-              onPressed: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return new ExpressPage();
-                }));
-              },
-            ),
-            //动态信息流/横幅/视频贴片广告
-            MaterialButton(
-              color: Colors.blue,
-              textColor: Colors.white,
-              child: new Text('app下载列表'),
-              onPressed: () async {
-                await FlutterTencentad.enterAPPDownloadListPage();
-              },
-            ),
-          ],
+                    //是否静音播放 默认false
+                    videoMuted: true,
+                  );
+                },
+              ),
+              //激励广告 竞价
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('激励广告（竞价）'),
+                onPressed: () async {
+                  await FlutterTencentad.loadRewardVideoAd(
+                      //android广告id
+                      androidId: "8260663462736446",
+                      //ios广告id
+                      iosId: "2250968442134762",
+                      //用户id
+                      userID: "123",
+                      //奖励
+                      rewardName: "100金币",
+                      //奖励数
+                      rewardAmount: 100,
+                      //扩展参数 服务器回调使用
+                      customData: "",
+                      //下载二次确认弹窗 默认false
+                      downloadConfirm: true,
+                      //开启竞价
+                      isBidding: true);
+                },
+              ),
+              //插屏广告（半屏）
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('插屏广告（半屏）'),
+                onPressed: () async {
+                  await FlutterTencentad.loadUnifiedInterstitialAD(
+                    //android广告id
+                    androidId: "6270368452032577",
+                    //ios广告id
+                    iosId: "8200166492635708",
+                    //是否全屏
+                    isFullScreen: false,
+                    //下载二次确认弹窗 默认false
+                    downloadConfirm: true,
+                  );
+                },
+              ),
+              //插屏广告（全屏）
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('插屏广告（全屏）'),
+                onPressed: () async {
+                  await FlutterTencentad.loadUnifiedInterstitialAD(
+                    //android广告id
+                    androidId: "6270368452032577",
+                    //ios广告id
+                    iosId: "8200166492635708",
+                    isFullScreen: true,
+                    //下载二次确认弹窗 默认false
+                    downloadConfirm: true,
+                  );
+                },
+              ),
+              //插屏广告（全屏）激励奖励
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('插屏广告（全屏）激励奖励'),
+                onPressed: () async {
+                  await FlutterTencentad.loadUnifiedInterstitialAD(
+                    //android广告id
+                    androidId: "6270368452032577",
+                    //ios广告id
+                    iosId: "8200166492635708",
+                    isFullScreen: true,
+                    //下载二次确认弹窗 默认false
+                    downloadConfirm: true,
+                  );
+                },
+              ),
+              //插屏广告（半屏竞价）
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('插屏广告（半屏竞价）'),
+                onPressed: () async {
+                  await FlutterTencentad.loadUnifiedInterstitialAD(
+                    //android广告id
+                    androidId: "4082654735526092",
+                    //ios广告id
+                    iosId: "6025576861231867",
+                    isFullScreen: false,
+                    //下载二次确认弹窗 默认false
+                    downloadConfirm: true,
+                    //是否开启竞价
+                    isBidding: true,
+                  );
+                },
+              ),
+              //Banner广告（平台模板）
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('Banner广告（平台模板）'),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return new BannerPage();
+                  }));
+                },
+              ),
+              //开屏广告
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('开屏广告'),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return new SplashPage(isBidding: false, androidId: "7244469240386265", iosId: "4264967221657739");
+                  }));
+                },
+              ),
+              //开屏广告
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('开屏广告(竞价)'),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return new SplashPage(
+                        //是否开启竞价
+                        isBidding: true,
+                        androidId: "7244469240386265",
+                        iosId: "4264967221657739");
+                  }));
+                },
+              ),
+              //动态信息流/横幅/视频贴片广告
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('动态信息流/横幅/视频贴片广告'),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return new ExpressPage();
+                  }));
+                },
+              ),
+              //动态信息流/横幅/视频贴片广告
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('app下载列表'),
+                onPressed: () async {
+                  await FlutterTencentad.enterAPPDownloadListPage();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

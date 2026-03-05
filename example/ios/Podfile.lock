@@ -2,8 +2,8 @@ PODS:
   - Flutter (1.0.0)
   - flutter_tencentad (0.0.1):
     - Flutter
-    - GDTMobSDK (= 4.15.50)
-  - GDTMobSDK (4.15.50)
+    - GDTMobSDK (= 4.15.65)
+  - GDTMobSDK (4.15.65)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -20,10 +20,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_tencentad/ios"
 
 SPEC CHECKSUMS:
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_tencentad: 18186244bcd57dbc7067d72117005300744d698b
-  GDTMobSDK: 9c8f21633121d4140e16dff2825dc3452cf993a2
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_tencentad: 7d71bb35e53c98faa46c9f59f4261dad4968ad82
+  GDTMobSDK: f3aefaaca7a7393300a7b4f667d361250ac764b4
 
-PODFILE CHECKSUM: cf0c950f7e9a456b4e325f5b8fc0f98906a3705a
+PODFILE CHECKSUM: 07c1311da4bb2861bade8c388c2b7b055a5bdf50
 
 COCOAPODS: 1.16.2
