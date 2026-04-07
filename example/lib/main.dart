@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tencentad/flutter_tencentad.dart';
@@ -46,13 +47,23 @@ class _HomePageState extends State<HomePage> {
         },
         onFail: (code, message) {
           print("激励广告失败 $code $message");
+          final random = Random();
+          int winPrice = random.nextInt(5000) + 1000;
+          FlutterTencentBiddingResult result = FlutterTencentBiddingResult().fail(
+            winPrice,
+            FlutterTencentAdBiddingLossReason.TIME_OUT,
+            FlutterTencentAdADNID.othoerADN,
+            posId: "8299807752053177",
+          );
+          FlutterTencentad.biddingAdLoadError(result: result);
         },
         onClose: () {
           print("激励广告关闭");
         },
         onReady: () async {
+          // 竞价不会执行到这里
           print("激励广告预加载准备就绪");
-          await FlutterTencentad.showRewardVideoAd();
+          FlutterTencentad.showRewardVideoAd();
         },
         onUnReady: () {
           print("激励广告预加载未准备就绪");
@@ -70,14 +81,21 @@ class _HomePageState extends State<HomePage> {
           print("激励广告竞价  ecpmLevel=$ecpmLevel  ecpm=$ecpm");
           //规则 自己根据业务处理
           if (ecpm > 0) {
+            final random = Random();
+            final int max = ecpm > 1000 ? 100 : 10;
+            int number = ecpm - (random.nextInt(max) + 1);
+            int highestLossPrice = number > 1 ? number : 1;
+            print("竞胜出价 $ecpm  最大竞败方出价 $highestLossPrice");
             //竞胜出价，类型为Integer
             //最大竞败方出价，类型为Integer
-            await FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().success(ecpm, 0));
+            FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().success(ecpm, highestLossPrice));
           } else {
+            final random = Random();
+            int winPrice = random.nextInt(5000) + 1000;
             //竞胜方出价（单位：分），类型为Integer
             //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
             //竞胜方渠道ID FlutterTencentAdADNID
-            await FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
+            FlutterTencentad.showRewardVideoAd(result: FlutterTencentBiddingResult().fail(winPrice, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
           }
         },
       ),
@@ -90,6 +108,15 @@ class _HomePageState extends State<HomePage> {
         },
         onFail: (code, message) {
           print("插屏广告失败 $code $message");
+          final random = Random();
+          int winPrice = random.nextInt(5000) + 1000;
+          FlutterTencentBiddingResult result = FlutterTencentBiddingResult().fail(
+            winPrice,
+            FlutterTencentAdBiddingLossReason.TIME_OUT,
+            FlutterTencentAdADNID.othoerADN,
+            posId: "8298989234757554",
+          );
+          FlutterTencentad.biddingAdLoadError(result: result);
         },
         onClose: () {
           print("插屏广告关闭");
@@ -98,8 +125,9 @@ class _HomePageState extends State<HomePage> {
           print("插屏广告曝光");
         },
         onReady: () async {
+          // 竞价不会执行到这里
           print("插屏广告预加载准备就绪");
-          await FlutterTencentad.showUnifiedInterstitialAD();
+          FlutterTencentad.showUnifiedInterstitialAD();
         },
         onUnReady: () {
           print("插屏广告预加载未准备就绪");
@@ -111,14 +139,21 @@ class _HomePageState extends State<HomePage> {
           print("插屏广告竞价  ecpmLevel=$ecpmLevel  ecpm=$ecpm");
           //规则 自己根据业务处理
           if (ecpm > 0) {
+            final random = Random();
+            final int max = ecpm > 1000 ? 100 : 10;
+            int number = ecpm - (random.nextInt(max) + 1);
+            int highestLossPrice = number > 1 ? number : 1;
+            print("竞胜出价 $ecpm  最大竞败方出价 $highestLossPrice");
             //竞胜出价，类型为Integer
             //最大竞败方出价，类型为Integer
-            await FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().success(ecpm, 0));
+            FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().success(ecpm, highestLossPrice));
           } else {
+            final random = Random();
+            int winPrice = random.nextInt(5000) + 1000;
             //竞胜方出价（单位：分），类型为Integer
             //优量汇广告竞败原因 FlutterTencentAdBiddingLossReason
             //竞胜方渠道ID FlutterTencentAdADNID
-            await FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().fail(1000, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
+            FlutterTencentad.showUnifiedInterstitialAD(result: FlutterTencentBiddingResult().fail(winPrice, FlutterTencentAdBiddingLossReason.LOW_PRICE, FlutterTencentAdADNID.othoerADN));
           }
         },
       ),
@@ -193,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                     //ios广告id
                     iosId: "2250968442134762",
                     //ohos广告id
-                    ohosId: "5171580898607362",
+                    ohosId: "8299807752053177",
                     //用户id
                     userID: "123",
                     //奖励
@@ -216,23 +251,24 @@ class _HomePageState extends State<HomePage> {
                 child: new Text('激励广告（竞价）'),
                 onPressed: () async {
                   await FlutterTencentad.loadRewardVideoAd(
-                      //android广告id
-                      androidId: "8260663462736446",
-                      //ios广告id
-                      iosId: "2250968442134762",
-                      ohosId: "5171580898607362",
-                      //用户id
-                      userID: "123",
-                      //奖励
-                      rewardName: "100金币",
-                      //奖励数
-                      rewardAmount: 100,
-                      //扩展参数 服务器回调使用
-                      customData: "",
-                      //下载二次确认弹窗 默认false
-                      downloadConfirm: true,
-                      //开启竞价
-                      isBidding: true);
+                    //android广告id
+                    androidId: "8260663462736446",
+                    //ios广告id
+                    iosId: "2250968442134762",
+                    ohosId: "8299807752053177",
+                    //用户id
+                    userID: "123",
+                    //奖励
+                    rewardName: "100金币",
+                    //奖励数
+                    rewardAmount: 100,
+                    //扩展参数 服务器回调使用
+                    customData: "",
+                    //下载二次确认弹窗 默认false
+                    downloadConfirm: true,
+                    //开启竞价
+                    isBidding: true,
+                  );
                 },
               ),
               //插屏广告（半屏）
@@ -246,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                     androidId: "6270368452032577",
                     //ios广告id
                     iosId: "8200166492635708",
-                    ohosId: "3183311380526666",
+                    ohosId: "8298989234757554",
                     //是否全屏
                     isFullScreen: false,
                     //下载二次确认弹窗 默认false
@@ -265,27 +301,29 @@ class _HomePageState extends State<HomePage> {
                     androidId: "6270368452032577",
                     //ios广告id
                     iosId: "8200166492635708",
-                    ohosId: "9133310340928744",
+                    ohosId: "9288088367889092",
                     isFullScreen: true,
                     //下载二次确认弹窗 默认false
                     downloadConfirm: true,
                   );
                 },
               ),
-              //插屏广告（全屏）激励奖励
+              //插屏广告（全屏竞价）
               MaterialButton(
                 color: Colors.blue,
                 textColor: Colors.white,
-                child: new Text('插屏广告（全屏）激励奖励'),
+                child: new Text('插屏广告（全屏竞价）'),
                 onPressed: () async {
                   await FlutterTencentad.loadUnifiedInterstitialAD(
                     //android广告id
                     androidId: "6270368452032577",
                     //ios广告id
                     iosId: "8200166492635708",
+                    ohosId: "9288088367889092",
                     isFullScreen: true,
                     //下载二次确认弹窗 默认false
                     downloadConfirm: true,
+                    isBidding: true,
                   );
                 },
               ),
@@ -300,6 +338,7 @@ class _HomePageState extends State<HomePage> {
                     androidId: "4082654735526092",
                     //ios广告id
                     iosId: "6025576861231867",
+                    ohosId: "8298989234757554",
                     isFullScreen: false,
                     //下载二次确认弹窗 默认false
                     downloadConfirm: true,

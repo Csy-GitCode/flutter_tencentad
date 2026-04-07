@@ -25,6 +25,7 @@ import {
 import FlutterTencentadEventPlugin from './FlutterTencentadEventPlugin';
 import FlutterTencentadViewPlugin from './FlutterTencentadViewPlugin';
 import TencentAdUtil from './TencentAdUtil';
+import FlutterTencentadConfig from './FlutterTencentadConfig';
 
 /** FlutterTencentadPlugin **/
 export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCallHandler, AbilityAware {
@@ -93,14 +94,14 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
       case "loadRewardVideoAd":
         this.loadRewardVideoAd(call, result);
         break;
-      case "showRewardVideoAd":
-        this.showRewardVideoAd(call, result);
+      case FlutterTencentadConfig.showRewardVideoAd:
+        this.biddingNotification(call, result, FlutterTencentadConfig.showRewardVideoAd);
         break;
       case "loadInterstitialAD":
         this.loadInterstitialAd(call, result);
         break;
-      case "showInterstitialAD":
-        this.showInterstitialAd(call, result);
+      case FlutterTencentadConfig.showInterstitialAD:
+        this.biddingNotification(call, result, FlutterTencentadConfig.showInterstitialAD);
         break;
       case "biddingAdLoadError": // 广告请求失败时
         TencentAdUtil.biddingAdLoadError(call, result);
@@ -198,7 +199,7 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
   }
 
   // 显示激励视频广告
-  private showRewardVideoAd(call: MethodCall, result: MethodResult): void {
+  private showRewardVideoAd(result: MethodResult): void {
     console.info("FlutterTencentadPlugin showRewardVideoAd called");
 
     if (!this.rewardAd) {
@@ -252,7 +253,7 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
         console.info("FlutterTencentadPlugin 激励广告曝光");
         const map: Record<string, string | number> = {
           "adType": "rewardAd",
-          "onAdMethod": "onShow"
+          "onAdMethod": "onExpose"
         };
         FlutterTencentadEventPlugin.sendContent(map);
       },
@@ -388,7 +389,7 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
   }
 
   // 显示插屏广告
-  private showInterstitialAd(call: MethodCall, result: MethodResult): void {
+  private showInterstitialAd(result: MethodResult): void {
     console.info("FlutterTencentadPlugin showInterstitialAd called");
 
     if (!this.interstitialAd) {
@@ -439,7 +440,7 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
         console.info("FlutterTencentadPlugin 插屏广告曝光");
         const map: Record<string, string | number> = {
           "adType": "interactAd",
-          "onAdMethod": "onShow"
+          "onAdMethod": "onExpose"
         };
         FlutterTencentadEventPlugin.sendContent(map);
       },
@@ -500,5 +501,50 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
     this.interstitialAd.show(currentWindowStage);
     console.info("FlutterTencentadPlugin 插屏广告 show 方法已调用");
     result.success(true);
+  }
+
+  /**
+   * 竞价上报
+   */
+  private biddingNotification(call: MethodCall, result: MethodResult, ad: string): void {
+    const isSuccess: boolean = call.args.get(FlutterTencentadConfig.isSuccess);
+    const expectCostPrice: number = call.args.get(FlutterTencentadConfig.expectCostPrice);
+    const highestLossPrice: number = call.args.get(FlutterTencentadConfig.highestLossPrice);
+    const posId: string = call.args.get(FlutterTencentadConfig.posId);
+    const winPrice: number = call.args.get(FlutterTencentadConfig.winPrice);
+    const lossReason: number = call.args.get(FlutterTencentadConfig.lossReason);
+    const adnId: number = call.args.get(FlutterTencentadConfig.adnId);
+
+    console.info(`${FlutterTencentadConfig.isSuccess}: ${isSuccess}`);
+    console.info(`${FlutterTencentadConfig.expectCostPrice}: ${expectCostPrice}`);
+    console.info(`${FlutterTencentadConfig.highestLossPrice}: ${highestLossPrice}`);
+    console.info(`${FlutterTencentadConfig.posId}: ${posId}`);
+    console.info(`${FlutterTencentadConfig.winPrice}: ${winPrice}`);
+    console.info(`${FlutterTencentadConfig.lossReason}: ${lossReason}`);
+    console.info(`${FlutterTencentadConfig.adnId}: ${adnId}`);
+
+    if (isSuccess === true) { // 竞价成功上报
+      if (ad == FlutterTencentadConfig.showInterstitialAD) {
+        TencentAdUtil.sendWinNotification(this.interstitialAd, expectCostPrice, highestLossPrice);
+        this.showInterstitialAd(result); // 显示广告
+        console.info("插屏广告 实时竞价，广告展示");
+      } else if (ad == FlutterTencentadConfig.showRewardVideoAd) {
+        TencentAdUtil.sendWinNotification(this.rewardAd, expectCostPrice, highestLossPrice);
+        this.showRewardVideoAd(result); // 显示广告
+        console.info("激励视频广告 实时竞价，广告展示");
+      }
+    } else if (isSuccess === false) { // 竞价失败上报
+      if (ad == FlutterTencentadConfig.showInterstitialAD) {
+        TencentAdUtil.sendLossNotification(this.interstitialAd, winPrice, lossReason, adnId);
+      } else if (ad == FlutterTencentadConfig.showRewardVideoAd) {
+        TencentAdUtil.sendLossNotification(this.rewardAd, winPrice, lossReason, adnId);
+      }
+    } else { // 没有竞价
+      if (ad == FlutterTencentadConfig.showInterstitialAD) {
+        this.showInterstitialAd(result); // 显示广告
+      } else if (ad == FlutterTencentadConfig.showRewardVideoAd) {
+        this.showRewardVideoAd(result); // 显示广告
+      }
+    }
   }
 }
