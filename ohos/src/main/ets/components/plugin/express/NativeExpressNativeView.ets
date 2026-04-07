@@ -3,7 +3,6 @@ import { window, NodeController } from '@kit.ArkUI';
 import {
   GDTAdSDK,
   GDTAdLoadConfig,
-  GDTAdLoadListener,
   GDTNativeAd,
   GDTRenderListener,
   GDTInteractionListener,
@@ -12,6 +11,9 @@ import {
   GDTError,
 } from '@gdt/gdt-union-sdk';
 import NativeExpressView from "./NativeExpressView";
+import { emitter } from '@kit.BasicServicesKit';
+import FlutterTencentadConfig from '../FlutterTencentadConfig';
+import TencentAdUtil from '../TencentAdUtil';
 
 @Component
 export struct NativeExpressNativeView {
@@ -22,12 +24,19 @@ export struct NativeExpressNativeView {
   @State isShowAd: boolean = false;
   @State adWidth: number = 0;
   @State adHeight: number = 0;
-
   posId: string = '';
   viewWidth: number = 0;
   viewHeight: number = 0;
   isBidding: boolean = false;
   windowStage?: window.WindowStage;
+  // 订阅事件
+  event: emitter.InnerEvent = {
+    eventId: FlutterTencentadConfig.NativeEventId
+  };
+  // 接收事件
+  callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    TencentAdUtil.biddingCallback(eventData, this.nativeAd, (): void => this.renderAD());
+  }
 
   build() {
     Column() {
@@ -42,6 +51,7 @@ export struct NativeExpressNativeView {
   }
 
   aboutToAppear(): void {
+    emitter.on(this.event, this.callback);
     this.posId = this.nativeExpressView.getPosId();
     this.viewWidth = this.nativeExpressView.getViewWidth();
     this.viewHeight = this.nativeExpressView.getViewHeight();
@@ -98,14 +108,16 @@ export struct NativeExpressNativeView {
     };
 
     const videoStateListener: GDTVideoStateListener = {
-      onVideoReady: (): void => {},
+      onVideoReady: (): void => {
+      },
       onVideoStart: (): void => {
         this.nativeExpressView.sendMsg("onVideoPlay", "视频开始播放");
       },
       onVideoPause: (): void => {
         this.nativeExpressView.sendMsg("onVideoPause", "视频暂停");
       },
-      onVideoResume: (): void => {},
+      onVideoResume: (): void => {
+      },
       onVideoComplete: (): void => {
         this.nativeExpressView.sendMsg("onVideoStop", "视频播放完成");
       },
@@ -132,8 +144,11 @@ export struct NativeExpressNativeView {
           this.nativeAd.setVideoStateListener(videoStateListener);
           this.nativeAd.setVideoOptions({ autoPlayMuted: true });
 
-          // 渲染广告
-          this.nativeAd.render(this.windowStage, this.getUIContext());
+          // 没有竞价，直接展示
+          if (!this.isBidding) {
+            this.renderAD();
+            console.info("Banner广告 没有竞价，广告展示");
+          }
         }
       },
       onError: (err: GDTError): void => {
@@ -141,6 +156,19 @@ export struct NativeExpressNativeView {
         this.nativeExpressView.sendMsg("onFail", { "code": err.code, "message": err.message });
       }
     });
+  }
+
+  /**
+   * 渲染广告
+   */
+  private renderAD() {
+    // 延时执行逻辑，要不然只会渲染最后一条广告
+    setTimeout(() => {
+      console.info("信息流广告 延时执行逻辑 eCpm: " + this.nativeAd?.getEcpm());
+      if (this.nativeAd?.isValid()) {
+        this.nativeAd?.render(this.windowStage, this.getUIContext());
+      }
+    }, 500);
   }
 
   private clearAd() {
@@ -151,6 +179,7 @@ export struct NativeExpressNativeView {
   }
 
   aboutToDisappear(): void {
+    emitter.off(FlutterTencentadConfig.NativeEventId);
     this.clearAd();
   }
 }

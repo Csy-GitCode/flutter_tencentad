@@ -92,7 +92,7 @@ export struct SplashNativeView {
         // 没有竞价，直接展示
         if (!this.isBidding) {
           this.showAD();
-          console.info("没有竞价，广告展示");
+          console.info("开屏广告 没有竞价，广告展示");
         }
       },
       onError: (err: GDTError): void => {

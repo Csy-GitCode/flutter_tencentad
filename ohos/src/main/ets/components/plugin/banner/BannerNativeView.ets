@@ -148,7 +148,7 @@ export struct BannerNativeView {
         // 没有竞价，直接展示
         if (!this.isBidding) {
           this.renderAD();
-          console.info("没有竞价，广告展示");
+          console.info("Banner广告 没有竞价，广告展示");
         }
       },
       onError: (err: GDTError): void => {
@@ -166,7 +166,7 @@ export struct BannerNativeView {
   private renderAD() {
     // 延时执行逻辑，要不然只会渲染最后一条广告
     setTimeout(() => {
-      console.info("延时执行逻辑 eCpm: " + this.bannerAd?.getEcpm());
+      console.info("Banner广告 延时执行逻辑 eCpm: " + this.bannerAd?.getEcpm());
       if (this.bannerAd?.isValid()) {
         this.bannerAd?.render(this.windowStage, this.getUIContext());
       }
