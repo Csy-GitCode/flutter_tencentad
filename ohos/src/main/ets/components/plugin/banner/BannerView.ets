@@ -1,12 +1,14 @@
-import { Any, BinaryMessenger, MethodChannel, PlatformView } from "@ohos/flutter_ohos";
+import { Any, BinaryMessenger, MethodCall, MethodCallHandler, MethodChannel, MethodResult, PlatformView } from "@ohos/flutter_ohos";
 import { common, UIAbility } from "@kit.AbilityKit";
 import { HashMap } from "@kit.ArkTS";
 import { window } from "@kit.ArkUI";
 import { Params } from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView';
 import FlutterTencentadConfig from "../FlutterTencentadConfig";
 import { BannerBuilder } from "./BannerNativeView";
+import { emitter } from "@kit.BasicServicesKit";
+import TencentAdUtil from "../TencentAdUtil";
 
-export default class BannerView extends PlatformView {
+export default class BannerView extends PlatformView implements MethodCallHandler {
   private posId: string = "";
   private viewWidth: number = 0;
   private viewHeight: number = 0;
@@ -14,6 +16,11 @@ export default class BannerView extends PlatformView {
   private channel: MethodChannel;
   private windowStage?: window.WindowStage;
   private uiContext?: UIContext;
+  // 订阅事件
+  event: emitter.InnerEvent = {
+    eventId: FlutterTencentadConfig.BannerEventId,
+    priority: emitter.EventPriority.IMMEDIATE
+  };
 
   constructor(
     context: common.Context,
@@ -28,6 +35,7 @@ export default class BannerView extends PlatformView {
     this.viewHeight = params.get("viewHeight") as number ?? 0;
     this.isBidding = params.get("isBidding") as boolean ?? false;
     this.channel = new MethodChannel(messenger, FlutterTencentadConfig.view.bannerAdView + "_" + viewId);
+    this.channel.setMethodCallHandler(this);
     this.windowStage = uIAbility.context.windowStage;
   }
 
@@ -61,6 +69,14 @@ export default class BannerView extends PlatformView {
 
   sendMsg(key: string, msg: Any) {
     this.channel.invokeMethod(key, msg);
+  }
+
+  /**
+   * 实时竞价
+   * 请求广告成功时
+   */
+  onMethodCall(call: MethodCall, result: MethodResult): void {
+    TencentAdUtil.onMethodCall(call, result, this.event);
   }
 
   dispose(): void {

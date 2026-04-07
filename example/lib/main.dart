@@ -319,6 +319,16 @@ class _HomePageState extends State<HomePage> {
                   }));
                 },
               ),
+              MaterialButton(
+                color: Colors.blue,
+                textColor: Colors.white,
+                child: new Text('Banner广告(竞价)'),
+                onPressed: () async {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) {
+                    return new BannerPage(isBidding: true);
+                  }));
+                },
+              ),
               //开屏广告
               MaterialButton(
                 color: Colors.blue,

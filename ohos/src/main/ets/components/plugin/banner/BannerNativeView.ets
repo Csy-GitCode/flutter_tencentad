@@ -12,6 +12,9 @@ import {
   GDTError,
 } from '@gdt/gdt-union-sdk';
 import BannerView from "./BannerView";
+import { emitter } from '@kit.BasicServicesKit';
+import FlutterTencentadConfig from '../FlutterTencentadConfig';
+import TencentAdUtil from '../TencentAdUtil';
 
 @Component
 export struct BannerNativeView {
@@ -22,12 +25,19 @@ export struct BannerNativeView {
   @State isShowAd: boolean = false;
   @State adWidth: number = 0;
   @State adHeight: number = 0;
-
   posId: string = '';
   viewWidth: number = 0;
   viewHeight: number = 0;
   isBidding: boolean = false;
   windowStage?: window.WindowStage;
+  // 订阅事件
+  event: emitter.InnerEvent = {
+    eventId: FlutterTencentadConfig.BannerEventId
+  };
+  // 接收事件
+  callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
+    TencentAdUtil.biddingCallback(eventData, this.bannerAd, (): void => this.renderAD());
+  }
 
   build() {
     Row() {
@@ -44,6 +54,7 @@ export struct BannerNativeView {
   }
 
   aboutToAppear(): void {
+    emitter.on(this.event, this.callback);
     this.posId = this.bannerView.getPosId();
     this.viewWidth = this.bannerView.getViewWidth();
     this.viewHeight = this.bannerView.getViewHeight();
@@ -103,12 +114,18 @@ export struct BannerNativeView {
     };
 
     const videoStateListener: GDTVideoStateListener = {
-      onVideoReady: (): void => {},
-      onVideoStart: (): void => {},
-      onVideoPause: (): void => {},
-      onVideoResume: (): void => {},
-      onVideoComplete: (): void => {},
-      onVideoError: (err: GDTError): void => {}
+      onVideoReady: (): void => {
+      },
+      onVideoStart: (): void => {
+      },
+      onVideoPause: (): void => {
+      },
+      onVideoResume: (): void => {
+      },
+      onVideoComplete: (): void => {
+      },
+      onVideoError: (err: GDTError): void => {
+      }
     };
 
     const adLoadListener: GDTAdLoadListener<GDTBannerAd> = {
@@ -128,8 +145,11 @@ export struct BannerNativeView {
         ad.setVideoStateListener(videoStateListener);
         ad.setRefresh(30); // 30秒轮播
 
-        // 渲染广告
-        ad.render(this.windowStage, this.getUIContext());
+        // 没有竞价，直接展示
+        if (!this.isBidding) {
+          this.renderAD();
+          console.info("没有竞价，广告展示");
+        }
       },
       onError: (err: GDTError): void => {
         console.error(`BannerNativeView Banner广告加载失败: ${err.code}, ${err.message}`);
@@ -140,7 +160,21 @@ export struct BannerNativeView {
     GDTAdSDK.getAdLoader().loadBannerAd(config, adLoadListener);
   }
 
+  /**
+   * 渲染广告
+   */
+  private renderAD() {
+    // 延时执行逻辑，要不然只会渲染最后一条广告
+    setTimeout(() => {
+      console.info("延时执行逻辑 eCpm: " + this.bannerAd?.getEcpm());
+      if (this.bannerAd?.isValid()) {
+        this.bannerAd?.render(this.windowStage, this.getUIContext());
+      }
+    }, 500);
+  }
+
   aboutToDisappear(): void {
+    emitter.off(FlutterTencentadConfig.BannerEventId);
     if (this.bannerAd) {
       this.bannerAd.destroy();
       this.bannerAd = undefined;

@@ -1,11 +1,10 @@
 import { Params } from '@ohos/flutter_ohos/src/main/ets/plugin/platform/PlatformView';
-import { emitter, Callback, print } from '@kit.BasicServicesKit';
-import {
-  GDTAdSDK, GDTAdLoadConfig, GDTAdLoadListener, GDTSplashAd, GDTInteractionListener, GDTError, GDTBiddingConstants,
-} from '@gdt/gdt-union-sdk';
+import { emitter, Callback } from '@kit.BasicServicesKit';
+import { GDTAdSDK, GDTAdLoadConfig, GDTAdLoadListener, GDTSplashAd, GDTInteractionListener, GDTError, } from '@gdt/gdt-union-sdk';
 import SplashView from "./SplashView";
 import FlutterTencentadPlugin from "../FlutterTencentadPlugin";
 import FlutterTencentadConfig from '../FlutterTencentadConfig';
+import TencentAdUtil from '../TencentAdUtil';
 
 @Component
 export struct SplashNativeView {
@@ -20,28 +19,11 @@ export struct SplashNativeView {
   isBidding: boolean = false;
   // 订阅事件
   event: emitter.InnerEvent = {
-    eventId: FlutterTencentadConfig.eventId
+    eventId: FlutterTencentadConfig.SplashEventId
   };
   // 接收事件
   callback: Callback<emitter.EventData> = (eventData: emitter.EventData) => {
-    console.info(`eventData: ${JSON.stringify(eventData)}`);
-    let method: string = eventData.data!.method;
-    if (method == "biddingSucceeded") { // 竞价成功上报
-      this.splashAd?.sendWinNotification(new Map([
-        [GDTBiddingConstants.EXPECT_COST_PRICE, '' + eventData.data!.expectCostPrice],
-        [GDTBiddingConstants.HIGHEST_LOSS_PRICE, '' + eventData.data!.highestLossPrice],
-      ]));
-      // 显示广告
-      this.showAD();
-      console.info("实时竞价，广告展示");
-    } else if (method == "biddingFail") { // 竞价失败上报
-      this.splashAd?.sendLossNotification(new Map([
-        [GDTBiddingConstants.WIN_PRICE, '' + eventData.data!.winPrice],
-        [GDTBiddingConstants.LOSS_REASON, '' + eventData.data!.lossReason],
-        [GDTBiddingConstants.ADN_ID, '' + eventData.data!.adnId],
-      ]));
-      console.info("实时竞价，竞价失败");
-    }
+    TencentAdUtil.biddingCallback(eventData, this.splashAd, (): void => this.showAD());
   }
 
   build() {
@@ -142,7 +124,7 @@ export struct SplashNativeView {
   }
 
   aboutToDisappear(): void {
-    emitter.off(FlutterTencentadConfig.eventId);
+    emitter.off(FlutterTencentadConfig.SplashEventId);
     this.clearAd();
   }
 }

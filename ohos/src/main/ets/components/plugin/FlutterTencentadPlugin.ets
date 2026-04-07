@@ -1,5 +1,12 @@
 import {
-  AbilityAware, AbilityPluginBinding, FlutterPlugin, FlutterPluginBinding, MethodCall, MethodCallHandler, MethodChannel, MethodResult,
+  AbilityAware,
+  AbilityPluginBinding,
+  FlutterPlugin,
+  FlutterPluginBinding,
+  MethodCall,
+  MethodCallHandler,
+  MethodChannel,
+  MethodResult,
 } from '@ohos/flutter_ohos';
 import { UIAbility } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
@@ -14,10 +21,10 @@ import {
   GDTVideoStateListener,
   GDTError,
   GDTGlobalSetting,
-  GDTBiddingConstants,
 } from '@gdt/gdt-union-sdk';
 import FlutterTencentadEventPlugin from './FlutterTencentadEventPlugin';
 import FlutterTencentadViewPlugin from './FlutterTencentadViewPlugin';
+import TencentAdUtil from './TencentAdUtil';
 
 /** FlutterTencentadPlugin **/
 export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCallHandler, AbilityAware {
@@ -96,7 +103,7 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
         this.showInterstitialAd(call, result);
         break;
       case "biddingAdLoadError": // 广告请求失败时
-        this.biddingAdLoadError(call, result);
+        TencentAdUtil.biddingAdLoadError(call, result);
         break;
       default:
         result.notImplemented();
@@ -492,32 +499,6 @@ export default class FlutterTencentadPlugin implements FlutterPlugin, MethodCall
     console.info("FlutterTencentadPlugin 开始展示插屏广告");
     this.interstitialAd.show(currentWindowStage);
     console.info("FlutterTencentadPlugin 插屏广告 show 方法已调用");
-    result.success(true);
-  }
-
-  /**
-   * 实时竞价
-   * 广告请求失败时上报
-   */
-  private biddingAdLoadError(call: MethodCall, result: MethodResult): void {
-    const posId: string = call.args.get("posId");
-    const winPrice: number = call.args.get("winPrice");
-    const lossReason: number = call.args.get("lossReason");
-    const adnId: number = call.args.get("adnId");
-
-    console.info(`posId: ${posId}`);
-    console.info(`winPrice: ${winPrice}`);
-    console.info(`lossReason: ${lossReason}`);
-    console.info(`adnId: ${adnId}`);
-
-    GDTAdSDK.sendLossNotification(new Map([
-      [GDTBiddingConstants.POS_ID, posId],
-      [GDTBiddingConstants.WIN_PRICE, '' + winPrice],
-      [GDTBiddingConstants.LOSS_REASON, '' + lossReason],
-      [GDTBiddingConstants.ADN_ID, '' + adnId],
-      [GDTBiddingConstants.WATERFALL_REQ_ID, '' + new Date().getTime()],
-    ]));
-    console.info("实时竞价 - 广告请求失败时上报");
     result.success(true);
   }
 }
